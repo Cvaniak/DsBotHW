@@ -10,3 +10,5 @@ Math eval based on [jfs StackOverflow](https://stackoverflow.com/a/9558001/11425
 First install ```pip install -r requirements.txt```  
 Then add file ```.env``` with line ```TOKEN="BOT TOKEN FROM DISCORD WEBSITE"```  
 Then run with ```python3 main.py```
+---
+TinyDb is cool but Herokus filesystem is ephemeral so db will be deleted every time you push commit or there is dyno updated.
