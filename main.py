@@ -66,13 +66,11 @@ async def on_message(message):
     
     # Bad words test
     mess_string = message.content.lower()
-    # https://stackoverflow.com/a/9841401/11425694 deletes duplicated letters
-    mess_string = ''.join(sorted(set(mess_string), key=mess_string.index))
     word_list = re.findall("[a-zA-Z]+", mess_string)
 
+    print(word_list)
     if any(word.lower() in full_list for word in word_list):
         db_query = db.search((DSUser.name == message.author.name) & (DSUser.serverID==message.guild.id))
-        print(db_query)
         if db_query:
             count_t = int(db_query[0]["count"])+1
             db.update({"count": count_t}, (DSUser.name == message.author.name) & (DSUser.serverID==message.guild.id))
