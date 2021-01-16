@@ -7,6 +7,8 @@ import requests
 import json
 from tinydb import TinyDB, Query
 import atexit
+import re
+
 load_dotenv()
 
 # Delete files with rude words when program is off
@@ -63,15 +65,20 @@ async def on_message(message):
             await message.channel.send("No ziomek, to nie jest wyrażenie matematyczne...")
     
     # Bad words test
-    word_list = message.content.split(" ")
-    if any(word in full_list for word in word_list):
-        db_query = db.search(DSUser.name == message.author.name)
+    mess_string = message.content.lower()
+    # https://stackoverflow.com/a/9841401/11425694 deletes duplicated letters
+    mess_string = ''.join(sorted(set(mess_string), key=mess_string.index))
+    word_list = re.findall("[a-zA-Z]+", mess_string)
+
+    if any(word.lower() in full_list for word in word_list):
+        db_query = db.search((DSUser.name == message.author.name) & (DSUser.serverID==message.guild.id))
+        print(db_query)
         if db_query:
             count_t = int(db_query[0]["count"])+1
-            db.update({"count": count_t}, DSUser.name == message.author.name)
+            db.update({"count": count_t}, (DSUser.name == message.author.name) & (DSUser.serverID==message.guild.id))
             await message.channel.send(F"Oj, oj już wisisz nam {message.author.name} całe {count_t}$!")
         else:
-            db.insert({"name": message.author.name, "count": 1})
+            db.insert({"name": message.author.name, "count": 1, "serverID": message.guild.id})
             await message.channel.send(F"No wiesz {message.author.name}, za takie słowa naliczam Ci dolca!")
 
     #For simple math only to not test everything
